@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}
+    Add Item
+{% endblock %}
+
+
+{% block content %}
+    <div class="h-screen w-full flex justify-center items-center bg-[#F5F5F5]">
+        <form 
+        class="max-w-[1100px] w-full flex flex-col gap-2"
+        action="" 
+        method="post" 
+        enctype="multipart/form-data">
+            {% csrf_token %}
+            <h2 class="font-bold font-sans text-4xl mb-2">
+                ADD ITEM
+            </h2>
+            <div class="flex gap-[20px]">
+                <div class="max-w-[700px] w-full">
+                    <div>
+                        {{ form.name }}
+                        <div class="text-red-500 font-semibold">
+                            {{ form.name.errors }}
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-bold ">
+                            Price
+                        </h2>
+                        <div class="flex bg-white max-w-[124px] rounded-lg border-2">
+                            <img src="{% static 'image/peso.svg'%}" />
+                            {{ form.price }}
+                        </div>
+                        <div class="text-red-500 font-semibold">
+                            {{ form.price.errors }}
+                        </div>
+                    </div>
+                    <div class="max-w-[320px] w-full">
+                        <h2 class="text-lg font-bold">
+                            Quantity in Stock
+                        </h2>
+                        {{ form.quantityInStock }}
+                        <div class="text-red-500 font-semibold"> 
+                            {{ form.quantityInStock.errors }}
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <h2 class="font-bold text-lg">
+                            Is Available
+                        </h2>
+                        <div class="text-red-500 font-semibold">
+                            {{ form.isAvailable }}
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div>
+                        <img class="max-w-[250px] max-w-[250px] object-cover mx-auto mb-[10px]" style="visibility: hidden;" id="imagePreview" />
+                    </div>
+                    <div>
+                        {{ form.Image }}
+                        <div class="text-red-500 font-semibold">
+                            {{ form.Image.errors }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% if form.non_field_errors %}
+                <div class="text-red-500 font-medium">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+            <button
+            class="bg-blue-900 max-w-[600px] w-full p-2 rounded-lg font-medium text-white my-4"
+            type="submit"
+            >
+                Add Item
+            </button>
+        </form>
+    </div>
+{% endblock %}
+{% block scripts %}
+    <script src="{% static 'js/AddItem.js'%}"></script>
+{% endblock %}

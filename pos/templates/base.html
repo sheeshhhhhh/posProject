@@ -9,10 +9,24 @@
         {% endblock %}
     </title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     {% block head %}
     {% endblock %}
 </head>
-<body>
+<body class="w-full min-h-screen flex">
+    <div class="h-screen w-[220px] py-8 bg-blue-900 flex flex-col items-center text-white">  
+        <h2 class="font-bold text-3xl">
+            SIDE BAR
+        </h2>
+        <div class="flex flex-col gap-2 text-lg font-medium mt-5 w-full items-start px-4">
+            <a href="/">
+                POS
+            </a>
+            <a href="/add_item">
+                ADD ITEM
+            </a>
+        </div>  
+    </div>
     {% block content %}
     {% endblock %}
     {% block scripts %}

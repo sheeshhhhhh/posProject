@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+{% endblock %}
+
+
+{% block content %}
+    <div class="h-screen w-full p-5">
+        <h2 class="text-4xl font-bold px-4">
+            Point Of Sales
+        </h2>
+        <div>
+            <!-- Search input later for id and also for name  -->
+        </div>
+        <div id="item-container" class="max-w-[900px] p-4 flex flex-wrap gap-5">
+            {% for item in items %}
+                <div class="p-1 border-2 w-full h-full max-w-[250px] max-h-[300px] rounded-lg">
+                    <div class="max-w-[250px] max-h-[150px] ">
+                        <img src="{{ item.Image }}" class="w-[250px] h-[150px] object-fill" />
+                    </div>
+                    <div>
+                        {{item.itemId}}
+                        <h2 class="text-2xl font-bold">
+                            {{ item.name }}
+                        </h2>
+                        <p class="font-medium">
+                            Price: {{ item.price }}
+                        </p>
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg mt-2">
+                            Add
+                        </button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

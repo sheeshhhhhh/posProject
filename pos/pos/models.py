@@ -1,14 +1,14 @@
 import datetime
 
 class Item():
-    def __init__(self, name, Image, price, quantity, isAvaialble):
+    def __init__(self, name, Image, price, quantity, isAvailable):
         self.itemId = None #supposed to be random
-        self.Image = Image
+        self.Image = Image #this is the image url
         self.name = name
         self.price = price
-        self.quantity = quantity #this is how much is bought
+        self.quantity = quantity #this is how much is bought // use for the main pos
         self.quantityInStock = 0 #and this is how much is in stock
-        self.isAvaialble = isAvaialble
+        self.isAvailable = isAvailable
         self.Category = None #don't know if will be used
 
     def calculate_tax(self):
@@ -25,11 +25,11 @@ class Item():
         self.quantity -= quantity
 
     def __str__(self):
-        return f"Item({self.name}, {self.price}, {self.quantity}, {self.isAvaialble})"
+        return self.name
 
     def __repr__(self):
-        return f"Item({self.name}, {self.price}, {self.quantity}, {self.isAvaialble})"
-        
+        return self.name
+            
 class Receipt:
     def __init__(self, order_id):
         self.order_id = order_id
