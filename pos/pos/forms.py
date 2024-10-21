@@ -1,9 +1,8 @@
-import os
 from random import seed
 
 from django import forms
-from django.conf import settings
-from django.core.files.storage import FileSystemStorage
+from django.core.files.base import ContentFile
+from django.core.files.storage import FileSystemStorage, default_storage
 
 from .models import Item
 from .values import CurrentCart, Items
@@ -31,6 +30,7 @@ class ProductItemForm(forms.Form):
     quantityInStock = forms.IntegerField(
         label='Quantity',
         required=True,
+        min_value=0,
         widget=forms.NumberInput(attrs={
             'class': 'max-w-[120px] h-[40px] text-xl font-medium px-2 outline-none border-2 rounded-lg',
         }),
@@ -70,8 +70,8 @@ class ProductItemForm(forms.Form):
         if cleaned_data.get('quantityInStock') < 0:
             self.add_error('quantityInStock', 'Quantity cannot be negative')
 
-        if cleaned_data.get('isAvailable') == False and cleaned_data.get('quantityInStock') < 0:
-            self.add_error('isAvailable', 'Item is not available but has stock')
+        if cleaned_data.get('isAvailable') == True and cleaned_data.get('quantityInStock') <= 0:
+            self.add_error('isAvailable', 'Item cannot be available if there is no stock')
 
         return cleaned_data
 
@@ -86,7 +86,8 @@ class ProductItemForm(forms.Form):
 
         #saving the image
         fs = FileSystemStorage()
-        media_path = os.path.join(settings.MEDIA_ROOT, 'uploads', ImageFile.name)
+        
+        media_path = default_storage.save('uploads/' + ImageFile.name, ContentFile(ImageFile.read()))
         filename = fs.save(media_path, ImageFile)
         uploadedFileUrl = fs.url(filename)
 
@@ -95,3 +96,91 @@ class ProductItemForm(forms.Form):
         Items.append(item)
 
         return item
+    
+
+class EditProductItemForm(forms.Form):
+    id = forms.IntegerField(
+        widget=forms.HiddenInput(),
+    )
+    name = forms.CharField(
+        label='Name',
+        max_length=100,
+        required=True,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Enter the name of the item',
+            'class': 'w-full h-[40px] text-xl font-medium px-2 outline-none border-2 rounded-lg',  # Add any additional classes here
+        }),
+    )
+    price = forms.FloatField(
+        label='Price',
+        required=True,
+        min_value=1,
+        widget=forms.NumberInput(attrs={
+            'class': 'max-w-[120px] h-[40px] text-xl font-medium px-2 outline-none',
+        }),
+    )
+    quantityInStock = forms.IntegerField(
+        label='Quantity',
+        required=True,
+        min_value=0,
+        widget=forms.NumberInput(attrs={
+            'class': 'max-w-[120px] h-[40px] text-xl font-medium px-2 outline-none border-2 rounded-lg',
+        }),
+    )
+    isAvailable = forms.BooleanField(
+        label='Is Available',
+        required=False,
+        widget=forms.CheckboxInput(attrs={
+            'class': 'w-[25px] h-[25px] ml-3',
+        }),
+    )
+    Image = forms.ImageField(
+        label='Image',
+        required=False,
+    )
+
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        if cleaned_data.get('price') <= 0: 
+            self.add_error('price', 'Price cannot be 0 or negative')
+
+        if cleaned_data.get('quantityInStock') < 0:
+            self.add_error('quantityInStock', 'Quantity cannot be negative')
+
+        if cleaned_data.get('isAvailable') == True and cleaned_data.get('quantityInStock') <= 0:
+            self.add_error('isAvailable', 'Item cannot be available if there is no stock')
+
+        return cleaned_data
+    
+    def save(self):
+        cleaned_data = self.clean()
+
+        id = cleaned_data.get('id')
+        name = cleaned_data.get('name')
+        price = cleaned_data.get('price')
+        quantityInStock = cleaned_data.get('quantityInStock')
+        isAvailable = cleaned_data.get('isAvailable')
+        ImageFile = cleaned_data.get('Image')
+        #saving the image
+        uploadedFileUrl = None
+        print(not isinstance(ImageFile, str))
+        if ImageFile != None and not isinstance(ImageFile, str):
+            print('image file contains')
+            fs = FileSystemStorage()
+            
+            media_path = default_storage.save('uploads/' + ImageFile.name, ContentFile(ImageFile.read()))
+            filename = fs.save(media_path, ImageFile)
+            uploadedFileUrl = fs.url(filename)
+
+
+        for item in Items:
+            if item.itemId == id:
+                item.name = name
+                item.price = price
+                item.quantityInStock = quantityInStock
+                item.isAvailable = isAvailable
+                if uploadedFileUrl != None:
+                    item.Image = uploadedFileUrl
+                break

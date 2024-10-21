@@ -16,10 +16,11 @@
         enctype="multipart/form-data">
             {% csrf_token %}
             <h2 class="font-bold font-sans text-4xl mb-2">
-                ADD ITEM
+                EDIT ITEM
             </h2>
             <div class="flex gap-[20px]">
                 <div class="max-w-[700px] w-full">
+                    {{ form.id }}
                     <div>
                         {{ form.name }}
                         <div class="text-red-500 font-semibold">
@@ -59,7 +60,11 @@
                 </div>
                 <div>
                     <div>
-                        <img src="" class="max-w-[250px] max-w-[250px] object-cover mx-auto mb-[10px]" style="visibility: hidden;" id="imagePreview" />
+                        {% if form.Image.value %}
+                            <img src="{{ form.Image.value }}" 
+                            class="max-w-[250px] max-w-[250px] object-cover mx-auto mb-[10px]" 
+                            id="initialImagePreview" />
+                        {% endif %}
                     </div>
                     <div>
                         {{ form.Image }}
@@ -78,11 +83,11 @@
             class="bg-blue-900 max-w-[600px] w-full p-2 rounded-lg font-medium text-white my-4"
             type="submit"
             >
-                Add Item
+                Edit Item
             </button>
         </form>
     </div>
 {% endblock %}
 {% block scripts %}
-    <script src="{% static 'js/AddItem.js'%}"></script>
+    <script src="{% static 'js/EditItem.js'%}"></script>
 {% endblock %}

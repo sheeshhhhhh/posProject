@@ -24,6 +24,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', view.pos),
     path('add_item/', view.add_item),
+    path('edit_item', view.ViewItemToEdit),
+    path('edit_item/<slug:id>', view.edit_item),
 ]
 
 

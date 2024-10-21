@@ -6,8 +6,8 @@ class Item():
         self.Image = Image #this is the image url
         self.name = name
         self.price = price
-        self.quantity = quantity #this is how much is bought // use for the main pos
-        self.quantityInStock = 0 #and this is how much is in stock
+        self.quantity = 0 #this is how much is bought // use for the main pos
+        self.quantityInStock = quantity #and this is how much is in stock
         self.isAvailable = isAvailable
         self.Category = None #don't know if will be used
 
