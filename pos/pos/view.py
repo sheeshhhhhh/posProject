@@ -1,23 +1,64 @@
-from django.shortcuts import render
-from .models import Item, Receipt, History
-from .forms import ProductItemForm, EditProductItemForm
-from .values import Items, CurrentCart
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 
+from .forms import EditProductItemForm, ProductItemForm
+from .initialValues import getInitialValues
+from .models import History, Item, OrderItem, Receipt
+from .values import CurrentCart, Items
 
+getInitialValues()
 
 # figure out how to limit the number of items in the cart because of quantity stock
 def pos(request):
-    print(Items)
-    return render(request, 'POS.html', { 'items' : Items })
+    if request.method == 'POST':
+        item_id = request.POST.get('item_id')
+        quantity = int(request.POST.get('quantity'))
+        action = request.POST.get('action')
+
+        item = next((item for item in Items if item.itemId == int(item_id)), None)
+
+        if item is None:
+            return redirect('/error')
+
+        if item.quantityInStock == 0 and action == 'add':
+            return redirect('/error')
+
+        if action == 'increment':
+            quantity += 1
+            item.quantityInStock -= 1
+        elif action == 'decrement':
+            quantity -= 1
+            item.quantityInStock += 1
+        item.quantity = quantity
+        
+        cart_item = next((cartItem for cartItem in CurrentCart if cartItem.item.itemId == int(item_id)), None)
+
+        if cart_item:
+            cart_item.quantity = quantity
+        else:
+            cart_item = OrderItem(item, quantity)
+            CurrentCart.append(cart_item)
+
+    print(CurrentCart)
+
+    Payments = {
+        'totalPayment' : 0,
+        'totalSub' : 0,
+        'totalTax' : 0,
+    }
+    
+    for item in CurrentCart:
+        Payments['totalPayment'] += item.calculate_total() 
+        Payments['totalSub'] += item.item.price * item.quantity
+        Payments['totalTax'] +=  item.item.calculate_tax() * item.quantity
+        
+    return render(request, 'POS.html', { 'items' : Items, 'Cart' : CurrentCart, 'Payments' : Payments })
 
 def add_item(request):
-    print(request.FILES)
     if request.method == 'POST':
         item = ProductItemForm(request.POST, request.FILES)
         if item.is_valid():
             item.save()
-            
+
             return redirect('/')
     else:
         item = ProductItemForm()    

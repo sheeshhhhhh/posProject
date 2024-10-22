@@ -11,7 +11,7 @@
         <div>
             <!-- Search Input maybe? -->
         </div>
-        <div id="item-container" class="max-w-[900px] p-4 flex flex-wrap gap-5">
+        <div id="item-container" class="p-4 flex flex-wrap gap-5">
             {% for item in items %}
                 <div class="p-1 border-2 w-full h-full max-w-[250px] max-h-[300px] rounded-lg">
                     <div class="max-w-[250px] max-h-[150px] ">
@@ -24,10 +24,10 @@
                         <p class="font-medium">
                             Price: {{ item.price }}
                         </p>
-                        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg mt-2">
-                            <a href="/edit_item/{{ item.itemId }}">
-                                Edit
-                            </a>
+                        <button 
+                        onclick="window.location.href='/edit_item/{{ item.itemId }}'"
+                        class="w-[58px] h-[40px] p-0 bg-blue-500 text-white  rounded-lg mt-2">
+                            Edit
                         </button>
                     </div>
                 </div>

@@ -2,9 +2,25 @@
 
 {% load static %}
 
-{% block title %}
+{% block head %}
+    <style>
+        /* Hide number input arrows */
+        /* https://www.w3schools.com/howto/howto_css_hide_arrow_number.asp */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+        }
+        
+        /* Firefox */
+        input[type=number] {
+          -moz-appearance: textfield;
+        }
+    </style>
 {% endblock %}
 
+{% block title %}
+{% endblock %}
 
 {% block content %}
     <div class="h-screen w-full p-5">
@@ -14,26 +30,94 @@
         <div>
             <!-- Search input later for id and also for name  -->
         </div>
-        <div id="item-container" class="max-w-[900px] p-4 flex flex-wrap gap-5">
-            {% for item in items %}
-                <div class="p-1 border-2 w-full h-full max-w-[250px] max-h-[300px] rounded-lg">
-                    <div class="max-w-[250px] max-h-[150px] ">
-                        <img src="{{ item.Image }}" class="w-[250px] h-[150px] object-fill" />
-                    </div>
-                    <div>
-                        {{item.itemId}}
-                        <h2 class="text-2xl font-bold">
-                            {{ item.name }}
+        <div class="w-full flex justify-around">
+            <div>
+                <div id="item-container" class="max-w-[1300px] min-w-[700px] w-auto p-4 flex flex-wrap gap-5 h-auto max-h-[859px] overflow-y-auto">
+                    {% for item in items %}
+                        {% if item.isAvailable == True %}
+                            <div class="p-1 border-2 w-full h-full max-w-[230px] max-h-[280px] rounded-lg">
+                                <div class="max-w-[250px] max-h-[150px] ">
+                                    <img src="{{ item.Image }}" class="w-[250px] h-[150px] object-fill" />
+                                </div>
+                                <div>
+                                    <h2 class="text-xl font-bold">
+                                        {{ item.name }}
+                                    </h2>
+                                    <p class="font-medium">
+                                        Price: {{ item.totalPrice }}
+                                    </p>
+                                    {{ item.quantityInStock }}
+                                    <form action="" method="post">
+                                        {% csrf_token %}
+                                        <input hidden value="{{ item.itemId }}" name="item_id" />
+                                        <button name="action" value="decrement"> 
+                                            -
+                                        </button>
+                                        <input 
+                                        value="{% if item.quantity %}{{ item.quantity }}{% else %}0{% endif %}"
+                                        id="{{ item.itemId }}" 
+                                        type="number" 
+                                        class="w-[70px] px-3 h-[30px] border-2 outline-none text-lg font-semibold rounded-lg" 
+                                        name="quantity" />
+                                        <button name="action" value="increment">
+                                            +
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div 
+            class="min-w-[200px] max-w-[300px] h-[859px] w-full flex flex-col items-center border-l-2"
+            id="counter-receipt">
+                <!-- put for loop later for the items -->
+                <div class="max-h-[553px] w-full h-full px-3">
+                    {% for cart in Cart %}
+                        <div class="flex justify-between w-full p-2">
+                            <h2 class="font-bold text-lg">
+                                {{ cart.item.name }}
+                            </h2>
+                            <div class="flex gap-3">
+                                <p class="text-lg font-medium">
+                                    {{ cart.item.price }}
+                                </p>
+                                <p class="text-lg font-medium">
+                                    x{{ cart.quantity }}
+                                </p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="flex flex-col max-w-[250px] w-full">
+                    <div class="flex justify-between" id="totalSub">
+                        <h2 class="font-bold text-2xl">
+                            total sub
                         </h2>
-                        <p class="font-medium">
-                            Price: {{ item.price }}
+                        <p class="text-lg font-medium">
+                            {{ Payments.totalSub }}
                         </p>
-                        <button class="bg-blue-500 text-white px-4 py-2 rounded-lg mt-2">
-                            Add
-                        </button>
+                    </div>
+                    <div class="flex justify-between" id="totalTax">
+                        <h2 class="font-bold text-2xl">
+                            total tax
+                        </h2>
+                        <p class="text-lg font-medium">
+                            {{ Payments.totalTax}}
+                        </p>
+                    </div>
+                    <div id="line" class="w-full border-b-2 mt-2"></div>
+                    <div class="flex justify-between" id="totalPayment">
+                        <h2 class="font-bold text-2xl">
+                            total Payment
+                        </h2>
+                        <p class="text-lg font-bold">
+                            {{ Payments.totalPayment}}
+                        </p>
                     </div>
                 </div>
-            {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}

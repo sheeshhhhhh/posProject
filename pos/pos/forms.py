@@ -24,6 +24,7 @@ class ProductItemForm(forms.Form):
         required=True,
         min_value=1,
         widget=forms.NumberInput(attrs={
+            'onkeydown': "return event.keyCode !== 69",
             'class': 'max-w-[120px] h-[40px] text-xl font-medium px-2 outline-none',
         }),
     )
@@ -32,6 +33,7 @@ class ProductItemForm(forms.Form):
         required=True,
         min_value=0,
         widget=forms.NumberInput(attrs={
+            'onkeydown': "return event.keyCode !== 69",
             'class': 'max-w-[120px] h-[40px] text-xl font-medium px-2 outline-none border-2 rounded-lg',
         }),
     )
@@ -116,6 +118,7 @@ class EditProductItemForm(forms.Form):
         required=True,
         min_value=1,
         widget=forms.NumberInput(attrs={
+            'onkeydown': "return event.keyCode !== 69",
             'class': 'max-w-[120px] h-[40px] text-xl font-medium px-2 outline-none',
         }),
     )
@@ -124,6 +127,7 @@ class EditProductItemForm(forms.Form):
         required=True,
         min_value=0,
         widget=forms.NumberInput(attrs={
+            'onkeydown': "return event.keyCode !== 69",\
             'class': 'max-w-[120px] h-[40px] text-xl font-medium px-2 outline-none border-2 rounded-lg',
         }),
     )
@@ -163,11 +167,10 @@ class EditProductItemForm(forms.Form):
         quantityInStock = cleaned_data.get('quantityInStock')
         isAvailable = cleaned_data.get('isAvailable')
         ImageFile = cleaned_data.get('Image')
+
         #saving the image
         uploadedFileUrl = None
-        print(not isinstance(ImageFile, str))
         if ImageFile != None and not isinstance(ImageFile, str):
-            print('image file contains')
             fs = FileSystemStorage()
             
             media_path = default_storage.save('uploads/' + ImageFile.name, ContentFile(ImageFile.read()))
@@ -181,6 +184,7 @@ class EditProductItemForm(forms.Form):
                 item.price = price
                 item.quantityInStock = quantityInStock
                 item.isAvailable = isAvailable
+                item.totalPrice = item.calculate_total()
                 if uploadedFileUrl != None:
                     item.Image = uploadedFileUrl
                 break

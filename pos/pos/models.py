@@ -6,10 +6,11 @@ class Item():
         self.Image = Image #this is the image url
         self.name = name
         self.price = price
-        self.quantity = 0 #this is how much is bought // use for the main pos
         self.quantityInStock = quantity #and this is how much is in stock
         self.isAvailable = isAvailable
-        self.Category = None #don't know if will be used
+        self.totalPrice = self.calculate_total()
+
+        self.quantity = 0
 
     def calculate_tax(self):
         # ano na to fix na yung 0.12 na tax di naman nababago yun eh
@@ -18,18 +19,32 @@ class Item():
     def calculate_total(self):
         return self.price + self.calculate_tax()
 
-    def add_quantity(self, quantity):
-        self.quantity += quantity
+    def addStockQuantity(self, quantity):
+        self.quantityInStock += quantity
 
-    def remove_quantity(self, quantity):
-        self.quantity -= quantity
+    def removeStockQuantity(self, quantity):
+        self.quantityInStock -= quantity
 
     def __str__(self):
         return self.name
 
     def __repr__(self):
         return self.name
-            
+
+class OrderItem:
+    def __init__(self, item: Item, quantity: int):
+        self.item = item
+        self.quantity = quantity
+
+    def calculate_total(self):
+        return self.item.calculate_total() * self.quantity
+
+    def __str__(self):
+        return f"OrderItem({self.item}, quantity={self.quantity})"
+
+    def __repr__(self):
+        return f"OrderItem({self.item}, quantity={self.quantity})"
+
 class Receipt:
     def __init__(self, order_id):
         self.order_id = order_id

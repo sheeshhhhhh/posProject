@@ -1,4 +1,4 @@
-from .models import Item, Receipt, History
+from .models import Item, Receipt, History, OrderItem
 
 Items: list[Item] = []
-CurrentCart: list[Item] = []
+CurrentCart: list[OrderItem] = []
