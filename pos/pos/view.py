@@ -1,44 +1,54 @@
 from django.shortcuts import redirect, render
+from django.views.decorators.http import require_http_methods
 
 from .forms import EditProductItemForm, ProductItemForm
+from .functions import handlePOSActions
 from .initialValues import getInitialValues
-from .models import History, Item, OrderItem, Receipt
-from .values import CurrentCart, Items
+from .models import Item, OrderItem, Receipt
+from .values import CurrentCart, Items, Receipts
 
 getInitialValues()
 
 # figure out how to limit the number of items in the cart because of quantity stock
 def pos(request):
     if request.method == 'POST':
-        item_id = request.POST.get('item_id')
-        quantity = int(request.POST.get('quantity'))
         action = request.POST.get('action')
+        if action == 'checkout':
+            totalSub = request.POST.get('totalSub')
+            totalTax = request.POST.get('totalTax')
+            totalPayment = request.POST.get('totalPayment')
+            customerPayment = request.POST.get('customer-payment')
 
-        item = next((item for item in Items if item.itemId == int(item_id)), None)
+            if not customerPayment:
+                print('no customer payment')
+                return redirect('/')
 
-        if item is None:
-            return redirect('/error')
+            # creating a receipt
+            receipt = Receipt(len(Receipts) + 1, totalTax, totalSub)
 
-        if item.quantityInStock == 0 and action == 'add':
-            return redirect('/error')
+            for item in CurrentCart:
+                receipt.add_item(item)
+            Receipts.append(receipt)
 
-        if action == 'increment':
-            quantity += 1
-            item.quantityInStock -= 1
-        elif action == 'decrement':
-            quantity -= 1
-            item.quantityInStock += 1
-        item.quantity = quantity
-        
-        cart_item = next((cartItem for cartItem in CurrentCart if cartItem.item.itemId == int(item_id)), None)
+            for item in Items:
+                item.quantity = 0
 
-        if cart_item:
-            cart_item.quantity = quantity
-        else:
-            cart_item = OrderItem(item, quantity)
-            CurrentCart.append(cart_item)
+            change = float(customerPayment) - float(totalPayment)
 
-    print(CurrentCart)
+            Payments = {
+                'totalPayment' : totalPayment,
+                'totalSub' : totalSub,
+                'totalTax' : totalTax,
+                'customerPayment' : customerPayment,
+                'change' : change
+            }
+
+            return render(request, 'POS.html', { 'items' : Items, 'Cart' : CurrentCart, 'Payments' : 
+            Payments, 'Receipts' : receipt })
+        elif action == 'decrement' or action == 'increment' or action == 'add':
+            handlePOSActions(request.POST)
+        elif action == 'clear':
+            CurrentCart.clear()
 
     Payments = {
         'totalPayment' : 0,
@@ -52,6 +62,8 @@ def pos(request):
         Payments['totalTax'] +=  item.item.calculate_tax() * item.quantity
         
     return render(request, 'POS.html', { 'items' : Items, 'Cart' : CurrentCart, 'Payments' : Payments })
+
+
 
 def add_item(request):
     if request.method == 'POST':
@@ -105,4 +117,4 @@ def edit_item(request, id):
             return redirect('/error')
     
     return render(request, 'EditItem.html', { 'form' : item })
-    
+

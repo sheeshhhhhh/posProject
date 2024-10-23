@@ -25,7 +25,7 @@
 {% block content %}
     <div class="h-screen w-full p-5">
         <h2 class="text-4xl font-bold px-4">
-            Point Of Sales
+            POS | SOLO BUSINESS OWNERS
         </h2>
         <div>
             <!-- Search input later for id and also for name  -->
@@ -43,24 +43,37 @@
                                     <h2 class="text-xl font-bold">
                                         {{ item.name }}
                                     </h2>
-                                    <p class="font-medium">
-                                        Price: {{ item.totalPrice }}
-                                    </p>
-                                    {{ item.quantityInStock }}
-                                    <form action="" method="post">
+                                    <div class="flex gap-6">
+                                        <p class="font-medium">
+                                            Price: {{ item.totalPrice }}
+                                        </p>
+                                        <p class="font-medium">
+                                            Stock: {{ item.quantityInStock }}
+                                        </p>
+                                    </div>
+                                    <form
+                                    onkeydown="if(event.keyCode === 13) return false"
+                                    action="" method="post">
                                         {% csrf_token %}
-                                        <input hidden value="{{ item.itemId }}" name="item_id" />
-                                        <button name="action" value="decrement"> 
-                                            -
-                                        </button>
-                                        <input 
-                                        value="{% if item.quantity %}{{ item.quantity }}{% else %}0{% endif %}"
-                                        id="{{ item.itemId }}" 
-                                        type="number" 
-                                        class="w-[70px] px-3 h-[30px] border-2 outline-none text-lg font-semibold rounded-lg" 
-                                        name="quantity" />
-                                        <button name="action" value="increment">
-                                            +
+                                        <div>
+                                            <input hidden value="{{ item.itemId }}" name="item_id" />
+                                            <button name="action" value="decrement"> 
+                                                -
+                                            </button>
+                                            <input 
+                                            min="0"
+                                            value="{% if item.quantity %}{{ item.quantity }}{% else %}0{% endif %}"
+                                            id="{{ item.itemId }}" 
+                                            type="number" 
+                                            onkeydown="return event.keyCode !== 69"
+                                            class="w-[70px] px-3 h-[30px] border-2 outline-none text-lg font-semibold rounded-lg" 
+                                            name="quantity" />
+                                            <button name="action" value="increment">
+                                                +
+                                            </button>
+                                        </div>
+                                        <button name="action" value="add">
+                                            add
                                         </button>
                                     </form>
                                 </div>
@@ -70,12 +83,29 @@
                 </div>
             </div>
             <div 
-            class="min-w-[200px] max-w-[300px] h-[859px] w-full flex flex-col items-center border-l-2"
+            class="min-w-[200px] max-w-[300px] h-[830px] w-full flex flex-col items-center border-l-2"
             id="counter-receipt">
-                <!-- put for loop later for the items -->
-                <div class="max-h-[553px] w-full h-full px-3">
+                <div class="w-full px-2 max-w-[300px]">
+                    <h2 class="text-2xl font-bold">
+                        Business Name
+                    </h2>
+                    <h2 class="text-xl font-semibold">
+                        Receipt
+                    </h2>
+                    {% if Receipts.order_id %}
+                        <div class="flex gap-9 max-w-[284px]">
+                            <h2 class="font-semibold ">
+                                Date: 
+                            </h2>
+                            <p class="font-medium">
+                                {{ Receipts.date}}
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+                <div id="cartItems" class="max-h-[453px] max-w-[250px] flex flex-col w-full h-full">
                     {% for cart in Cart %}
-                        <div class="flex justify-between w-full p-2">
+                        <div class="flex justify-between w-full p-1">
                             <h2 class="font-bold text-lg">
                                 {{ cart.item.name }}
                             </h2>
@@ -90,8 +120,13 @@
                         </div>
                     {% endfor %}
                 </div>
-                <div class="flex flex-col max-w-[250px] w-full">
+                <form 
+                action="/"
+                method="post"
+                class="flex flex-col max-w-[250px] w-full">
+                    {% csrf_token %}
                     <div class="flex justify-between" id="totalSub">
+                        <input hidden name="totalSub" value="{{ Payments.totalSub }}" type="number">
                         <h2 class="font-bold text-2xl">
                             total sub
                         </h2>
@@ -100,24 +135,82 @@
                         </p>
                     </div>
                     <div class="flex justify-between" id="totalTax">
+                        <input hidden name="totalTax" value="{{ Payments.totalTax }}" type="number">
                         <h2 class="font-bold text-2xl">
-                            total tax
+                            total tax <span class="text-xs">(VAT 12%)</span>
                         </h2>
                         <p class="text-lg font-medium">
-                            {{ Payments.totalTax}}
+                            {{ Payments.totalTax | floatformat:2 }}
                         </p>
                     </div>
                     <div id="line" class="w-full border-b-2 mt-2"></div>
                     <div class="flex justify-between" id="totalPayment">
+                        <input hidden name="totalPayment" value="{{ Payments.totalPayment }}" type="number">
                         <h2 class="font-bold text-2xl">
                             total Payment
                         </h2>
                         <p class="text-lg font-bold">
-                            {{ Payments.totalPayment}}
+                            {{ Payments.totalPayment| floatformat:2 }}
                         </p>
                     </div>
-                </div>
+                    <div>
+                        <div class="my-4">
+                            {% if Payments.customerPayment %}
+                                <div class="flex justify-between text-lg">
+                                    <h2 class="font-bold">
+                                        Payment
+                                    </h2>
+                                    <p class="font-medium">
+                                        {{ Payments.customerPayment }}
+                                    </p>
+                                </div>
+                                <div class="flex justify-between text-lg">
+                                    <h2 class="font-bold">
+                                        Change
+                                    </h2>
+                                    <p class="font-medium">
+                                        {{ Payments.change| floatformat:2 }}
+                                    </p>
+                                </div>
+                            {% else %}
+                                <div class="flex justify-between text-lg">
+                                    <h2 class="font-bold">Payment</h2>
+                                    <input step="any" class="font-semibold outline-none border-b-2 px-2 text-lg" 
+                                    name="customer-payment" type="number" value="0" 
+                                    onkeydown="return event.keyCode !== 69"
+                                    min="{{ Payments.totalPayment }}"  />
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="w-full flex flex-col gap-2 items-center mt-4">
+                            {% if Payments.customerPayment %}
+                                <button 
+                                name="action"
+                                value="clear" 
+                                class="max-w-[200px] w-full bg-red-900 rounded-lg p-2 text-lg text-white font-bold">
+                                    Clear
+                                </button>
+                                <!-- will print something -->
+                                <button
+                                onclick="printDiv('counter-receipt')"
+                                type="button"
+                                class="max-w-[200px] w-full bg-blue-900 rounded-lg p-2 text-lg text-white font-bold"
+                                >
+                                    Print                                    
+                                </button>    
+                            {% else %}
+                                <button 
+                                name="action"
+                                value="checkout" 
+                                class="max-w-[200px] w-full bg-blue-900 rounded-lg p-2 text-lg text-white font-bold">
+                                    Checkout
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
+    <script src="{% static 'js/POS.js' %}"></script>
 {% endblock %}

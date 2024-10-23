@@ -1,5 +1,6 @@
 import datetime
 
+
 class Item():
     def __init__(self, name, Image, price, quantity, isAvailable):
         self.itemId = None #supposed to be random
@@ -19,11 +20,8 @@ class Item():
     def calculate_total(self):
         return self.price + self.calculate_tax()
 
-    def addStockQuantity(self, quantity):
-        self.quantityInStock += quantity
-
-    def removeStockQuantity(self, quantity):
-        self.quantityInStock -= quantity
+    def totalQuantity(self):
+        return self.quantityInStock + self.quantity
 
     def __str__(self):
         return self.name
@@ -46,27 +44,20 @@ class OrderItem:
         return f"OrderItem({self.item}, quantity={self.quantity})"
 
 class Receipt:
-    def __init__(self, order_id):
+    def __init__(self, order_id, totalTax, totalSub):
         self.order_id = order_id
-        self.items: list[Item] = []
+        self.items: list[OrderItem] = []
+        self.date = datetime.datetime.now()
+        self.totalTax = totalTax
+        self.totalSub = totalSub
+        self.total_cost = self.totalTax + self.totalSub
 
     def add_item(self, item: Item):
         self.items.append(item)
-
-    def calculate_total_cost(self):
-        total_cost = 0
-        for item in self.items:
-            total_cost += item.calculate_total()
-        return total_cost
     
     def __str__(self):
-        return f"Receipt({self.order_id}, cost={self.calculate_total_cost()})"
+        return f"Receipt({self.order_id}, cost={self.total_cost})"
 
     def __repr__(self):
-        return f"Receipt({self.order_id}, cost={self.calculate_total_cost()})"
+        return f"Receipt({self.order_id}, cost={self.total_cost})"
     
-
-class History:
-    def __init__(self, receipt: Receipt):
-        self.receipt = receipt
-        self.data = datetime.datetime.now()
