@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block head %}
+    <style>
+        /* Hide number input arrows */
+        /* https://www.w3schools.com/howto/howto_css_hide_arrow_number.asp */
+            input::-webkit-outer-spin-button,
+            input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="h-screen w-full p-5">
+        <h2 class="text-4xl font-bold px-4">
+            History Receipts
+        </h2>
+        <form action="" method="post" class="flex items-center gap-2">
+            {% csrf_token %}
+            <!-- Search input later for reciept_id and date-->
+            <input 
+            id="order_id"
+            onkeydown="return event.keyCode !== 69"
+            type="number"
+            name="order_id"
+            value="{% if search %}{{ search}}{% endif %}"
+            class="h-[40px] w-[300px] text-lg border-2 rounded-lg px-3 p-1 rounded-lg outline-none font-medium"
+            placeholder="order Id" 
+            type="text">
+            <input 
+            id="date"
+            class="p-1 px-2 border-2 rounded-lg outline-none text-lg mr-2 font-mono font-medium"
+            name="date"
+            max='{% now "Y-m-d" %}'
+            type="date">
+            <!-- add here dropdown maybe? for month -->
+            <button
+            value="{% if date %}{{ date }}{% endif %}"
+            class="max-w-[100px] max-h-[40px] w-full bg-blue-900 rounded-lg p-2 text-lg text-white font-bold"
+            type="submit"
+            >
+                Search
+            </button>
+            <button
+            onclick="clearSearch()"
+            class="max-w-[200px] w-full bg-blue-900 rounded-lg p-2 text-white font-bold"
+            type="button"
+            >
+                Clear Search
+            </button>
+        </form>
+        <div class="border-2 rounded-lg p-2 mt-3">
+            <table class="w-full h-full">
+                <thead class="border-b-2 ">
+                    <tr>
+                        <th class="w-[20%] text-2xl font-bold pb-2">Date</th>
+                        <th class="w-[20%] text-2xl font-bold pb-2">Order id</th>
+                        <th class="w-[20%] text-2xl font-bold pb-2">Total Sub</th>
+                        <th class="w-[20%] text-2xl font-bold pb-2">total Tax</th>
+                        <th class="w-[20%] text-2xl font-bold pb-2">total Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for receipt in Receipts %}
+                        <tr>
+                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.date }}</td>
+                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.order_id }}</td>
+                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.totalSub | floatformat:2 }}</td>
+                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.totalTax | floatformat:2}}</td>
+                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.total_cost | floatformat:2 }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <button
+            class="bg-blue-900 text-white font-bold p-2 rounded-lg mt-3"
+            onclick="nextPage()"
+            >
+                Next
+            </button>
+        </div>
+    </div>
+    <script src="{% static 'js/History.js' %}"></script>
+{% endblock %}

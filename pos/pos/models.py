@@ -44,10 +44,10 @@ class OrderItem:
         return f"OrderItem({self.item}, quantity={self.quantity})"
 
 class Receipt:
-    def __init__(self, order_id, totalTax, totalSub):
+    def __init__(self, order_id, totalTax, totalSub, date=datetime.datetime.today()):
         self.order_id = order_id
         self.items: list[OrderItem] = []
-        self.date = datetime.datetime.now()
+        self.date = date
         self.totalTax = totalTax
         self.totalSub = totalSub
         self.total_cost = self.totalTax + self.totalSub
