@@ -27,6 +27,8 @@ urlpatterns = [
     path('edit_item', view.ViewItemToEdit),
     path('edit_item/<slug:id>', view.edit_item),
     path('history/', view.history),
+    path('dashboard/', view.dashboard),
+    path('api/dashboard/', view.api_dashboard)
 ]
 
 

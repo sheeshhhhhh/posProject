@@ -1,6 +1,10 @@
 
 const Url = new URL(window.location.href);
-const page = Url.searchParams.get('page')
+let page = Url.searchParams.get('page') 
+
+if (!page) {
+    window.location.assign('/history?page=1');
+}
 
 if (page == 1) {
     document.getElementById('prev').disabled = true;

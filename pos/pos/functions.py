@@ -1,8 +1,10 @@
 
+from datetime import datetime
+
 from django.shortcuts import redirect
 
 from .models import OrderItem
-from .values import CurrentCart, Items
+from .values import CurrentCart, Items, Receipts
 
 
 # POS ACTIONS WILL INCLUDE INCREMENT, DECREMENT AND ADD(OR EDIT)
@@ -55,3 +57,61 @@ def handlePOSActions(body):
     for cartItem in CurrentCart:
         if cartItem.quantity == 0:
             CurrentCart.remove(cartItem)
+
+
+def getMonthNumber(month: str=None):
+
+    if not month:
+        return datetime.now().month
+
+    months = {
+        'January': 1,
+        'February': 2,
+        'March': 3,
+        'April': 4,
+        'May': 5,
+        'June': 6,
+        'July': 7,
+        'August': 8,
+        'September': 9,
+        'October': 10,
+        'November': 11,
+        'December': 12
+    }
+
+    return months[month]
+
+def processDataDashboard(monthNum: int=10):
+
+    dashboardmonth = [receipt for receipt in Receipts if receipt.date.month == monthNum]
+    monthtax = sum([receipt.totalTax for receipt in dashboardmonth])
+    monthsub = sum([receipt.totalSub for receipt in dashboardmonth])
+    monthtotal  = sum([receipt.total_cost for receipt in dashboardmonth])
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+
+    data = []
+
+    for month in months:
+        month_Num = months.index(month) + 1
+
+        getthisMonth = [receipt for receipt in Receipts if receipt.date.month == month_Num]
+        getTotalRevenue = sum([receipt.total_cost for receipt in getthisMonth])
+        getTotalTax = sum([receipt.totalTax for receipt in getthisMonth])
+
+        data.append({
+            "month": month,
+            "totalRevenue": getTotalRevenue,
+            'totalTax' : getTotalTax
+        })
+
+    return {
+        "dashboardmonth" : {
+            "month": months[monthNum - 1],
+            "totalTax": monthtax,
+            "totalSub": monthsub,
+            "total": monthtotal
+        },
+        "data" : data
+    }
+
+

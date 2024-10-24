@@ -2,10 +2,12 @@ from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from .forms import EditProductItemForm, ProductItemForm
-from .functions import handlePOSActions
+from .functions import handlePOSActions, getMonthNumber, processDataDashboard
 from .initialValues import getInitialValues
 from .models import Item, OrderItem, Receipt
 from .values import CurrentCart, Items, Receipts
+from django.http import JsonResponse
+from datetime import datetime
 
 getInitialValues()
 
@@ -123,14 +125,41 @@ def history(request):
     date = None
     if request.method == 'POST':
         search = request.POST.get('order_id')
-        date = request.POST.get('date')
+        date_str = request.POST.get('date')
         page = 1 # page is always 1 when searching 
+
+        if date_str:
+            try:
+                date = datetime.strptime(date_str, "%Y-%m-%d").date() 
+            except ValueError:
+                date = None 
+
 
         if search:
             reciepts = [reciepts for idx, reciepts in enumerate(Receipts) 
-                        if str(search) in str(reciepts.order_id) and idx <= int(page) * 10]
+                        if str(search) in str(reciepts.order_id)]
+            
+            # for pagination and idx <= int(page) * 10
         elif date:
             reciepts = [reciepts for idx, reciepts in enumerate(Receipts) 
-                        if str(date) in str(reciepts.date) and idx <= int(page) * 10]
+                        if date == reciepts.date.date()]
+            # for pagination and idx <= int(page) * 10
 
     return render(request, 'history.html', { 'Receipts' : reciepts, 'search' : search, 'date' : date})
+
+def dashboard(request):
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    return render(request, 'dashboard.html', { 'months' : months })
+
+@require_http_methods(['GET'])
+def api_dashboard(request):
+    month = request.GET.get('month')
+    getMonthNum = getMonthNumber(month)
+    data = None
+
+    if getMonthNum is None:
+        return JsonResponse({'error' : 'Month not found'}, status=404)
+    else:
+        data = processDataDashboard(getMonthNum)
+
+    return JsonResponse(data, status=200)

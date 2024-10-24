@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block head %}
+   
+{% endblock %}
+
+{% block content %}
+    <div class="h-screen w-full p-5 ">
+        <div class="flex justify-between max-w-[1100px]">
+            <h1 class="text-4xl font-bold px-4">Dashboard</h1>
+            <select id="month-selector" class="font-bold mr-28 p-2 rounded-lg">
+                {% for month in months %}
+                    <option class="font-bold" value="{{ month }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="flex gap-16 p-2 mt-[150px] ml-5 mr-auto max-w-[1500px]">
+            <div class="w-full h-full max-w-[450px] max-h-[450px]">
+                <h2 id="month-dashboard" class="font-bold text-2xl text-center">
+                </h2>
+                <h2 id="month-total" class="font-medium text-lg my-2 text-center">
+                </h2>
+                <canvas id="pieChart"></canvas>
+            </div>
+            <div class="w-full h-full max-w-[1150px] max-h-[700px]">
+                <canvas id="barChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'js/Dashboard.js' %}"></script>
+{% endblock %}
