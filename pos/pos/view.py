@@ -118,7 +118,7 @@ def edit_item(request, id):
 
 def history(request):
     page = request.GET.get('page', 1)
-    reciepts = [reciepts for idx, reciepts in enumerate(Receipts) if idx <= int(page) * 10 and idx > (int(page) - 1) * 10]
+    reciepts = [reciepts for idx, reciepts in enumerate(Receipts) if idx < int(page) * 10 and idx >= (int(page) - 1) * 10]
     search = None
     date = None
     if request.method == 'POST':
@@ -127,8 +127,10 @@ def history(request):
         page = 1 # page is always 1 when searching 
 
         if search:
-            reciepts = [reciepts for idx, reciepts in enumerate(Receipts) if str(search) in str(reciepts.order_id) and idx <= int(page) * 10]
+            reciepts = [reciepts for idx, reciepts in enumerate(Receipts) 
+                        if str(search) in str(reciepts.order_id) and idx <= int(page) * 10]
         elif date:
-            reciepts = [reciepts for idx, reciepts in enumerate(Receipts) if str(date) in str(reciepts.date) and idx <= int(page) * 10]
+            reciepts = [reciepts for idx, reciepts in enumerate(Receipts) 
+                        if str(date) in str(reciepts.date) and idx <= int(page) * 10]
 
     return render(request, 'history.html', { 'Receipts' : reciepts, 'search' : search, 'date' : date})

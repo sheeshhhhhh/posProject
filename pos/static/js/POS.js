@@ -1,3 +1,6 @@
+
+
+
 async function printDiv(divId) {
     const printContents = document.getElementById(divId).innerHTML;
     let printWindow = window.open('', '', 'height=1000, width=1000');

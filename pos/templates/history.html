@@ -70,19 +70,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for receipt in Receipts %}
+                    {% if Receipts %}
+                        {% for receipt in Receipts %}
+                            <tr>
+                                <td class="py-2 font-medium text-lg pl-4">{{ receipt.date }}</td>
+                                <td class="py-2 font-medium text-lg pl-4">{{ receipt.order_id }}</td>
+                                <td class="py-2 font-medium text-lg pl-4">{{ receipt.totalSub | floatformat:2 }}</td>
+                                <td class="py-2 font-medium text-lg pl-4">{{ receipt.totalTax | floatformat:2}}</td>
+                                <td class="py-2 font-medium text-lg pl-4">{{ receipt.total_cost | floatformat:2 }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
                         <tr>
-                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.date }}</td>
-                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.order_id }}</td>
-                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.totalSub | floatformat:2 }}</td>
-                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.totalTax | floatformat:2}}</td>
-                            <td class="py-2 font-medium text-lg pl-4">{{ receipt.total_cost | floatformat:2 }}</td>
+                            <td class="py-2 font-medium text-lg pl-4">No Receipts Found</td>
                         </tr>
-                    {% endfor %}
+                    {% endif %}
                 </tbody>
             </table>
         </div>
         <div>
+            <button
+            id="prev"
+            class="bg-blue-900 text-white font-bold p-2 rounded-lg mt-3"
+            onclick="prevPage()"
+            >
+                Prev
+            </button>
             <button
             class="bg-blue-900 text-white font-bold p-2 rounded-lg mt-3"
             onclick="nextPage()"
