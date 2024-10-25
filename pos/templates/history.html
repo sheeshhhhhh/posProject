@@ -26,7 +26,6 @@
         </h2>
         <form action="" method="get" class="flex items-center gap-2">
             {% csrf_token %}
-
             <input 
             id="order_id"
             onkeydown="return event.keyCode !== 69"
@@ -39,6 +38,8 @@
 
             <input 
             id="date"
+            onkeydown="return event.keyCode !== 69"
+            value="{% if date %}{{ date }}{% endif %}"
             class="p-1 px-2 border-2 rounded-lg outline-none text-lg mr-2 font-mono font-medium"
             name="date"
             max='{% now "Y-m-d" %}'

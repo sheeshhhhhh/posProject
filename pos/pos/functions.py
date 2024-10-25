@@ -60,7 +60,6 @@ def handlePOSActions(body):
 
 
 def getMonthNumber(month: str=None):
-
     if not month:
         return datetime.now().month
 
@@ -81,7 +80,7 @@ def getMonthNumber(month: str=None):
 
     return months[month]
 
-def processDataDashboard(monthNum: int=10):
+def processDataDashboard(monthNum: int=datetime.now().month):
 
     dashboardmonth = [receipt for receipt in Receipts if receipt.date.month == monthNum]
     monthtax = sum([receipt.totalTax for receipt in dashboardmonth])

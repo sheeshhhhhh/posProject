@@ -25,7 +25,16 @@ SECRET_KEY = 'django-insecure-4gi2)(=l_iw*8llc#gn%&j*)uexzrwyu!s-#29u+7np)ew#b#&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = [
+    # for origin and csrf_token in the forms
+    'https://7bca6vab-368g7lej-dts7kvbqaxsg.ac4-preview.marscode.dev'
+]
+ALLOWED_HOSTS = [
+    # name of the website with https
+    "https://7bca6vab-368g7lej-dts7kvbqaxsg.ac4-preview.marscode.dev", 
+    # with no https
+    "7bca6vab-368g7lej-dts7kvbqaxsg.ac4-preview.marscode.dev"
+]
 
 
 # Application definition

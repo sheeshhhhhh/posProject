@@ -9,6 +9,7 @@ from .functions import getMonthNumber, handlePOSActions, processDataDashboard
 from .initialValues import getInitialValues
 from .models import Item, OrderItem, Receipt
 from .values import CurrentCart, Items, Receipts
+from datetime import datetime
 
 getInitialValues()
 
@@ -134,8 +135,6 @@ def history(request):
     search = request.GET.get('order_id', '') or ''
     date_str  = request.GET.get('date')
 
-
-
     filtered_receipts = Receipts
 
     if search:
@@ -168,6 +167,7 @@ def history(request):
 
 def dashboard(request):
     months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    months = [month for month in months if months.index(month) + 1 <= datetime.now().month]
     return render(request, 'Dashboard.html', { 'months' : months })
 
 @require_http_methods(['GET'])
