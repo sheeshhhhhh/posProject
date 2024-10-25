@@ -39,13 +39,13 @@
                 </button>
             </form>
         </div>
-        <div class="w-full flex justify-around">
-            <div>
+        <div class="w-full flex justify-between">
+            <div class="max-w-[1300px]">
                 <div id="item-container" class="max-w-[1300px] min-w-[700px] w-full p-4 flex flex-wrap gap-5 h-auto max-h-[859px] overflow-y-auto">
                     {% for item in items %}
                         {% if item.isAvailable == True %}
                             <div class="p-1 border-2 w-full h-full max-w-[230px] max-h-[280px] rounded-lg bg-white">
-                                <div class="max-w-[250px] max-h-[150px] ">
+                                <div class=" max-w-[200px] lg:max-w-[250px] lg:max-h-[150px] ">
                                     <img src="{{ item.Image }}" class="w-[250px] h-[150px] object-fill" />
                                 </div>
                                 <div>

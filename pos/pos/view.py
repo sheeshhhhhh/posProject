@@ -35,6 +35,8 @@ def pos(request):
 
             for item in Items:
                 item.quantity = 0
+                if item.totalQuantity() <= 0:
+                    item.isAvailable = False
 
             change = float(customerPayment) - float(totalPayment)
 
@@ -46,8 +48,8 @@ def pos(request):
                 'change' : change
             }
 
-            return render(request, 'POS.html', { 'items' : Items, 'Cart' : CurrentCart, 'Payments' : 
-            Payments, 'Receipts' : receipt })
+            return render(request, 'POS.html', { 'items' : Items, 'Cart' : CurrentCart, 
+                            'Payments' : Payments, 'Receipts' : receipt })
         elif action == 'decrement' or action == 'increment' or action == 'add':
             handlePOSActions(request.POST)
         elif action == 'clear':
@@ -57,7 +59,7 @@ def pos(request):
     search = request.GET.get('search') or ''
     
     if search:
-        items = [item for item in Items if search in item.name or search in str(item.itemId)]
+        items = [item for item in Items if search.lower() in item.name.lower() or search in str(item.itemId)]
 
     Payments = {
         'totalPayment' : 0,
