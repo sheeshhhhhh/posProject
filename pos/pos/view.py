@@ -87,7 +87,7 @@ def add_item(request):
 
 def ViewItemToEdit(request):
 
-    return render(request, "ViewToEdit.html", { 'items' : Items})
+    return render(request, "ViewtoEdit.html", { 'items' : Items})
 
 #id is slug
 # reference https://www.w3schools.com/django/django_slug_field.php on Modify View Section
@@ -168,7 +168,7 @@ def history(request):
 
 def dashboard(request):
     months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-    return render(request, 'dashboard.html', { 'months' : months })
+    return render(request, 'Dashboard.html', { 'months' : months })
 
 @require_http_methods(['GET'])
 def api_dashboard(request):
