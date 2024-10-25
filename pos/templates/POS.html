@@ -23,19 +23,28 @@
 {% endblock %}
 
 {% block content %}
-    <div class="h-screen w-full p-5">
-        <h2 class="text-4xl font-bold px-4">
-            POS | SOLO BUSINESS OWNERS
-        </h2>
-        <div>
-            <!-- Search input later for id and also for name  -->
+    <div class="h-screen w-full p-5 overflow-hidden">
+        <div class="flex gap-4 items-center">
+            <h2 class="text-3xl font-bold px-4">
+                POS | SOLO BUSINESS OWNERS
+            </h2>
+            <form class="px-4 font-semibold my-2 flex gap-2"
+            action="" method="get" >
+                {% csrf_token %}
+                <input value="{% if search %}{{ search }}{% endif %}" 
+                name="search" placeholder="Search Id or Name" 
+                class="text-lg p-1 px-2 outline-none rounded-lg border-2 border-black" />
+                <button name="action" value="search" class="text-lg font-bold p-1 px-2 bg-blue-900 text-white rounded-lg">
+                    Search
+                </button>
+            </form>
         </div>
         <div class="w-full flex justify-around">
             <div>
-                <div id="item-container" class="max-w-[1300px] min-w-[700px] w-auto p-4 flex flex-wrap gap-5 h-auto max-h-[859px] overflow-y-auto">
+                <div id="item-container" class="max-w-[1300px] min-w-[700px] w-full p-4 flex flex-wrap gap-5 h-auto max-h-[859px] overflow-y-auto">
                     {% for item in items %}
                         {% if item.isAvailable == True %}
-                            <div class="p-1 border-2 w-full h-full max-w-[230px] max-h-[280px] rounded-lg">
+                            <div class="p-1 border-2 w-full h-full max-w-[230px] max-h-[280px] rounded-lg bg-white">
                                 <div class="max-w-[250px] max-h-[150px] ">
                                     <img src="{{ item.Image }}" class="w-[250px] h-[150px] object-fill" />
                                 </div>
@@ -52,12 +61,13 @@
                                         </p>
                                     </div>
                                     <form
-                                    onkeydown="if(event.keyCode === 13) return false"
+                                    class="w-full flex justify-center my-2 gap-2"
                                     action="" method="post">
                                         {% csrf_token %}
                                         <div>
+                                            <button hidden name="action" value="add"></button>
                                             <input hidden value="{{ item.itemId }}" name="item_id" />
-                                            <button name="action" value="decrement"> 
+                                            <button class="text-2xl font-bold" name="action" value="decrement"> 
                                                 -
                                             </button>
                                             <input 
@@ -66,15 +76,12 @@
                                             id="{{ item.itemId }}" 
                                             type="number" 
                                             onkeydown="return event.keyCode !== 69"
-                                            class="w-[70px] px-3 h-[30px] border-2 outline-none text-lg font-semibold rounded-lg" 
+                                            class="text-center w-[70px] px-3 h-[30px] border-2 outline-none text-lg font-semibold rounded-lg" 
                                             name="quantity" />
-                                            <button name="action" value="increment">
+                                            <button class="text-2xl font-bold" name="action" value="increment">
                                                 +
                                             </button>
                                         </div>
-                                        <button name="action" value="add">
-                                            add
-                                        </button>
                                     </form>
                                 </div>
                             </div>
@@ -173,9 +180,9 @@
                                     </p>
                                 </div>
                             {% else %}
-                                <div class="flex justify-between text-lg">
+                                <div class="flex justify-between text-lg gap-3">
                                     <h2 class="font-bold">Payment</h2>
-                                    <input step="any" class="font-semibold outline-none border-b-2 px-2 text-lg" 
+                                    <input step="any" class="font-semibold outline-none border-b-2 px-2 text-lg max-w-[250px] w-full" 
                                     name="customer-payment" type="number" value="0" 
                                     onkeydown="return event.keyCode !== 69"
                                     min="{{ Payments.totalPayment }}"  />

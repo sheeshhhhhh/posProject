@@ -1,18 +1,19 @@
+from datetime import datetime
+
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
 
 from .forms import EditProductItemForm, ProductItemForm
-from .functions import handlePOSActions, getMonthNumber, processDataDashboard
+from .functions import getMonthNumber, handlePOSActions, processDataDashboard
 from .initialValues import getInitialValues
 from .models import Item, OrderItem, Receipt
 from .values import CurrentCart, Items, Receipts
-from django.http import JsonResponse
-from datetime import datetime
 
 getInitialValues()
 
-# figure out how to limit the number of items in the cart because of quantity stock
 def pos(request):
+    items = Items
     if request.method == 'POST':
         action = request.POST.get('action')
         if action == 'checkout':
@@ -52,6 +53,12 @@ def pos(request):
         elif action == 'clear':
             CurrentCart.clear()
 
+
+    search = request.GET.get('search') or ''
+    
+    if search:
+        items = [item for item in Items if search in item.name or search in str(item.itemId)]
+
     Payments = {
         'totalPayment' : 0,
         'totalSub' : 0,
@@ -63,7 +70,7 @@ def pos(request):
         Payments['totalSub'] += item.item.price * item.quantity
         Payments['totalTax'] +=  item.item.calculate_tax() * item.quantity
         
-    return render(request, 'POS.html', { 'items' : Items, 'Cart' : CurrentCart, 'Payments' : Payments })
+    return render(request, 'POS.html', { 'items' : items, 'Cart' : CurrentCart, 'Payments' : Payments, 'search' : search })
 
 def add_item(request):
     if request.method == 'POST':
@@ -95,8 +102,8 @@ def edit_item(request, id):
         item = EditProductItemForm(request.POST, request.FILES, initial={
             'Image' :  initialImage
         })
+
         if item.is_valid():
-            # shoud put item.editSave() here later
             item.save()
             return redirect('/')            
     else:
@@ -119,33 +126,43 @@ def edit_item(request, id):
     return render(request, 'EditItem.html', { 'form' : item })
 
 def history(request):
-    page = request.GET.get('page', 1)
-    reciepts = [reciepts for idx, reciepts in enumerate(Receipts) if idx < int(page) * 10 and idx >= (int(page) - 1) * 10]
-    search = None
-    date = None
-    if request.method == 'POST':
-        search = request.POST.get('order_id')
-        date_str = request.POST.get('date')
-        page = 1 # page is always 1 when searching 
+    page_number = int(request.GET.get('page', 1) or 1)
+    item_per_page = 10
 
-        if date_str:
-            try:
-                date = datetime.strptime(date_str, "%Y-%m-%d").date() 
-            except ValueError:
-                date = None 
+    search = request.GET.get('order_id', '') or ''
+    date_str  = request.GET.get('date')
 
 
-        if search:
-            reciepts = [reciepts for idx, reciepts in enumerate(Receipts) 
-                        if str(search) in str(reciepts.order_id)]
-            
-            # for pagination and idx <= int(page) * 10
-        elif date:
-            reciepts = [reciepts for idx, reciepts in enumerate(Receipts) 
-                        if date == reciepts.date.date()]
-            # for pagination and idx <= int(page) * 10
 
-    return render(request, 'history.html', { 'Receipts' : reciepts, 'search' : search, 'date' : date})
+    filtered_receipts = Receipts
+
+    if search:
+        filtered_receipts = [receipt for receipt in Receipts if search in str(receipt.order_id)]
+
+    if date_str:
+        try:
+            date = datetime.strptime(date_str, '%Y-%m-%d').date()
+            filtered_receipts = [receipt for receipt in Receipts if date == receipt.date.date()]
+        except ValueError as e:
+            print(e)
+            date = None 
+
+    start_index = (page_number - 1) * item_per_page
+    end_index = start_index + item_per_page
+    paginated_receipts = filtered_receipts[start_index:end_index]
+
+    # check for pagination avalailable
+    has_next = end_index < len(filtered_receipts)
+    has_previous = start_index > 0
+
+    return render(request, 'history.html', { 
+        'Receipts' : paginated_receipts, 
+        'search' : search, 
+        'date' : date_str,
+        'page_number': page_number,
+        'has_next': has_next,
+        'has_previous': has_previous
+    })
 
 def dashboard(request):
     months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']

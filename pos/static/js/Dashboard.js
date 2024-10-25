@@ -26,7 +26,7 @@ const getData = async (month=undefined) => {
         const piectx = document.getElementById('pieChart');
         const header = document.getElementById('month-dashboard');
         const total = document.getElementById('month-total')
-        header.innerHTML = `Dashboard for ${dashboard.month}`
+        header.innerHTML = `Statistic for ${dashboard.month}`
         monthSelector.value = dashboard.month
         total.innerHTML = `Total: ${dashboard.total}`
 
@@ -37,8 +37,8 @@ const getData = async (month=undefined) => {
                 datasets: [{
                     label: 'Tax, Sub Total and Total',
                     data: [dashboard.totalTax, dashboard.totalSub],
-                    backgroundColor: ['#1e3a8a', '#3b82f6'],
-                    borderColor: ['#1e3a8a', '#3b82f6'],
+                    backgroundColor: ['#3b82f6','#1e3a8a'],
+                    borderColor: ['#3b82f6', '#1e3a8a'],
                     borderWidth: 1
                 }]
             }

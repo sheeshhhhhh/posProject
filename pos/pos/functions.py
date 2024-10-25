@@ -89,6 +89,10 @@ def processDataDashboard(monthNum: int=10):
     monthtotal  = sum([receipt.total_cost for receipt in dashboardmonth])
     months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
+    # limit date of the month to now
+    currentMonth = datetime.now().month
+    months = [month for month in months if months.index(month) + 1 <= currentMonth]
+
     data = []
 
     for month in months:

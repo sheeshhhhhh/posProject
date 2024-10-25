@@ -24,9 +24,9 @@
         <h2 class="text-4xl font-bold px-4">
             History Receipts
         </h2>
-        <form action="" method="post" class="flex items-center gap-2">
+        <form action="" method="get" class="flex items-center gap-2">
             {% csrf_token %}
-            <!-- Search input later for reciept_id and date-->
+
             <input 
             id="order_id"
             onkeydown="return event.keyCode !== 69"
@@ -36,13 +36,14 @@
             class="h-[40px] w-[300px] text-lg border-2 rounded-lg px-3 p-1 rounded-lg outline-none font-medium"
             placeholder="order Id" 
             type="text">
+
             <input 
             id="date"
             class="p-1 px-2 border-2 rounded-lg outline-none text-lg mr-2 font-mono font-medium"
             name="date"
             max='{% now "Y-m-d" %}'
             type="date">
-            <!-- add here dropdown maybe? for month -->
+
             <button
             value="{% if date %}{{ date }}{% endif %}"
             class="max-w-[100px] max-h-[40px] w-full bg-blue-900 rounded-lg p-2 text-lg text-white font-bold"
@@ -50,6 +51,7 @@
             >
                 Search
             </button>
+
             <button
             onclick="clearSearch()"
             class="max-w-[200px] w-full bg-blue-900 rounded-lg p-2 text-white font-bold"
@@ -57,6 +59,7 @@
             >
                 Clear Search
             </button>
+
         </form>
         <div class="border-2 rounded-lg p-2 mt-3">
             <table class="w-full h-full">
@@ -88,20 +91,17 @@
                 </tbody>
             </table>
         </div>
-        <div>
-            <button
-            id="prev"
-            class="bg-blue-900 text-white font-bold p-2 rounded-lg mt-3"
-            onclick="prevPage()"
-            >
-                Prev
-            </button>
-            <button
-            class="bg-blue-900 text-white font-bold p-2 rounded-lg mt-3"
-            onclick="nextPage()"
-            >
-                Next
-            </button>
+        <div class="pagination-controls mt-3">
+
+            {% if has_previous %}
+                <a href="?page={{ page_number|add:-1 }}&order_id={{ search }}&date={{ date }}" class="bg-blue-900 text-white font-bold p-2 rounded-lg">Prev</a>
+            {% endif %}
+        
+            <span class="mx-2 font-bold ">Page {{ page_number }}</span>
+        
+            {% if has_next %}
+                <a href="?page={{ page_number|add:1 }}&order_id={{ search }}&date={{ date }}" class="bg-blue-900 text-white font-bold p-2 rounded-lg">Next</a>
+            {% endif %}
         </div>
     </div>
     <script src="{% static 'js/History.js' %}"></script>
